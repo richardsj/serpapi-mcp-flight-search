@@ -38,23 +38,24 @@ def register_tools(mcp):
         mcp: The MCP server instance
     """
     @mcp.tool()
-    async def search_flights_tool(origin: str, destination: str, outbound_date: str, return_date: str = None):
+    async def search_flights_tool(origin: str, destination: str, outbound_date: str, return_date: str = None, travel_class: int = 1):
         """
         Search for flights using SerpAPI Google Flights.
-        
+
         This MCP tool allows AI models to search for flight information by specifying
         departure and arrival airports and travel dates.
-        
+
         Args:
             origin: Departure airport code (e.g., ATL, JFK)
             destination: Arrival airport code (e.g., LAX, ORD)
             outbound_date: Departure date (YYYY-MM-DD)
             return_date: Return date for round trips (YYYY-MM-DD)
-            
+            travel_class: Cabin class (1=Economy, 2=Premium Economy, 3=Business, 4=First, default=1)
+
         Returns:
             A list of available flights with details
         """
-        return await search_flights(origin, destination, outbound_date, return_date)
+        return await search_flights(origin, destination, outbound_date, return_date, travel_class)
 
     @mcp.tool()
     def server_status():

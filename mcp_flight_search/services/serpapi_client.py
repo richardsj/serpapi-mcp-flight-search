@@ -27,16 +27,17 @@ async def run_search(params: Dict[str, Any]):
         logger.exception(f"SerpAPI search error: {str(e)}")
         return {"error": str(e)}
 
-def prepare_flight_search_params(origin: str, destination: str, outbound_date: str, return_date: str = None) -> Dict[str, Any]:
+def prepare_flight_search_params(origin: str, destination: str, outbound_date: str, return_date: str = None, travel_class: int = 1) -> Dict[str, Any]:
     """
     Prepare parameters for a flight search.
-    
+
     Args:
         origin: Departure airport code
         destination: Arrival airport code
         outbound_date: Departure date (YYYY-MM-DD)
         return_date: Return date for round trips (YYYY-MM-DD)
-        
+        travel_class: Cabin class (1=Economy, 2=Premium Economy, 3=Business, 4=First)
+
     Returns:
         Dictionary of parameters for SerpAPI
     """
@@ -49,7 +50,8 @@ def prepare_flight_search_params(origin: str, destination: str, outbound_date: s
         "arrival_id": destination.strip().upper(),
         "outbound_date": outbound_date,
         "currency": "USD",
-        "type": "2"  # One-way trip by default
+        "type": "2",  # One-way trip by default
+        "travel_class": travel_class
     }
     
     # Add return date if provided (making it a round trip)

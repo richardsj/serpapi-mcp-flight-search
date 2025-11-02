@@ -3,29 +3,33 @@ Logging configuration for MCP Flight Search.
 """
 import logging
 import os
-from rich.logging import RichHandler
+import sys
 
 def setup_logging():
-    # Respect MCP_LOG_LEVEL environment variable, default to ERROR
-    # Otherwise we get all sorts of horrible parsing errors for non-JSON messages
-    log_level_name = os.environ.get("MCP_LOG_LEVEL", "ERROR").upper()
-    log_level = getattr(logging, log_level_name, logging.ERROR)
+    # Respect MCP_LOG_LEVEL environment variable, default to CRITICAL
+    # For MCP stdio mode, we must not output anything to stdout except JSON
+    log_level_name = os.environ.get("MCP_LOG_LEVEL", "CRITICAL").upper()
+    log_level = getattr(logging, log_level_name, logging.CRITICAL)
 
+    # Send all logs to stderr to avoid breaking MCP JSON protocol on stdout
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(logging.Formatter(
+        "| %(levelname)-8s | %(name)s | %(message)s"
+    ))
 
     """Configure and set up logging for the application."""
     logging.basicConfig(
         level=log_level,
-        format="| %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="[%Y-%m-%d %H:%M:%S]",
-        handlers=[RichHandler(rich_tracebacks=True)],
-        force=True  # This is the fix that overrides uvicorn & third-party loggers
+        handlers=[handler],
+        force=True  # Override uvicorn & third-party loggers
     )
 
     logger = logging.getLogger("flight_search")
-    logging.getLogger("uvicorn.access").setLevel(logging.INFO)
-    logging.getLogger("uvicorn.error").setLevel(logging.INFO)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    
+    # Suppress all third-party loggers to avoid stdout pollution
+    logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
+    logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
+    logging.getLogger("httpx").setLevel(logging.CRITICAL)
+
     return logger
 
 # Create the logger instance for import by other modules

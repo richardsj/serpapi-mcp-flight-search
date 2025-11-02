@@ -48,6 +48,8 @@ export SERP_API_KEY="your-api-key-here"
 - MCP-compliant tools for flight search functionality
 - Integration with SerpAPI Google Flights
 - Support for one-way and round-trip flights
+- Support for all cabin classes (Economy, Premium Economy, Business, First)
+- Configurable logging levels via MCP_LOG_LEVEL environment variable
 - Rich logging with structured output
 - Modular, maintainable code structure
 
@@ -60,6 +62,7 @@ This package provides the following Model Context Protocol tools:
   - `destination`: Arrival airport code (e.g., LAX, ORD)
   - `outbound_date`: Departure date (YYYY-MM-DD)
   - `return_date`: Optional return date for round trips (YYYY-MM-DD)
+  - `travel_class`: Optional cabin class (1=Economy [default], 2=Premium Economy, 3=Business, 4=First)
 
 - `server_status`: Check if the MCP server is running
 
