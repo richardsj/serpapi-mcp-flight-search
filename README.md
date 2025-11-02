@@ -47,24 +47,65 @@ export SERP_API_KEY="your-api-key-here"
 
 - MCP-compliant tools for flight search functionality
 - Integration with SerpAPI Google Flights
-- Support for one-way and round-trip flights
+- Support for one-way, round-trip, and **multi-city flights**
 - Support for all cabin classes (Economy, Premium Economy, Business, First)
+- Advanced filtering: stops, layover duration (including multi-day stopovers)
+- **Intelligent multi-city search** with iterative departure token chaining
+- **Selection strategies**: cheapest, fastest, or balanced route optimization
+- **Airline exclusions**: Filter out specific carriers (e.g., avoid Chinese/UAE airlines)
+- **Time window filtering**: Restrict searches to specific departure time ranges
 - Configurable logging levels via MCP_LOG_LEVEL environment variable
-- Rich logging with structured output
+- Defensive error handling to prevent MCP crashes
 - Modular, maintainable code structure
 
 ## MCP Tools
 
 This package provides the following Model Context Protocol tools:
 
-- `search_flights_tool`: Search for flights between airports with parameters:
-  - `origin`: Departure airport code (e.g., ATL, JFK)
-  - `destination`: Arrival airport code (e.g., LAX, ORD)
-  - `outbound_date`: Departure date (YYYY-MM-DD)
-  - `return_date`: Optional return date for round trips (YYYY-MM-DD)
-  - `travel_class`: Optional cabin class (1=Economy [default], 2=Premium Economy, 3=Business, 4=First)
+### `search_flights_tool`
+Search for one-way or round-trip flights with advanced filtering options.
 
-- `server_status`: Check if the MCP server is running
+**Parameters:**
+- `origin`: Departure airport code (e.g., ATL, JFK)
+- `destination`: Arrival airport code (e.g., LAX, ORD)
+- `outbound_date`: Departure date (YYYY-MM-DD)
+- `return_date`: Optional return date for round trips (YYYY-MM-DD)
+- `travel_class`: Cabin class (1=Economy [default], 2=Premium Economy, 3=Business, 4=First)
+- `stops`: Number of stops (0=Any [default], 1=Nonstop only, 2=1 stop or fewer, 3=2 stops or fewer)
+- `layover_duration`: Layover duration range in minutes as "min,max"
+  - Example: `"90,330"` for 1.5-5.5 hours
+  - Example: `"1440,10080"` for 1-7 days (great for extended stopovers!)
+
+### `search_multi_city_flights_tool`
+Search for complex multi-city itineraries using **iterative leg-by-leg search** with intelligent flight selection.
+
+This tool uses Google Flights' progressive selection model: it searches the first leg, automatically selects the best option based on your strategy, then chains to the next leg using departure tokens. This ensures you get complete, bookable multi-city itineraries.
+
+**Parameters:**
+- `flights`: JSON string of flight segments. Each segment must have `departure_id`, `arrival_id`, and `date`.
+  - Example: `'[{"departure_id":"SYD","arrival_id":"SIN","date":"2025-12-01"},{"departure_id":"SIN","arrival_id":"LHR","date":"2025-12-05"}]'`
+  - This searches SYD→SIN on Dec 1, then SIN→LHR on Dec 5 (4-day stopover in Singapore)
+- `travel_class`: Cabin class for all segments (1=Economy [default], 2=Premium Economy, 3=Business, 4=First)
+- `stops`: Number of stops per segment (0=Any [default], 1=Nonstop only, 2=1 stop or fewer, 3=2 stops or fewer)
+- `layover_duration`: Layover duration range in minutes as "min,max" (e.g., "1440,10080" for 1-7 days)
+- `exclude_airlines`: Comma-separated airline codes to exclude (e.g., "CA,MU,EY,EK" to avoid Chinese/UAE carriers)
+- `outbound_times`: Departure time range as "start,end" in 24h format (e.g., "09,23" for 9am-11pm flights only)
+- `selection_strategy`: How to choose flights - "cheapest" [default], "fastest", or "balanced"
+
+**How It Works:**
+1. Searches leg 1 and automatically selects the best option (cheapest/fastest/balanced)
+2. Uses that flight's departure token to search leg 2 with compatible connections
+3. Repeats for all legs, building a complete itinerary
+4. Returns all selected legs with total price, duration, and API calls used
+
+**Use Cases:**
+- Extended stopovers in multiple cities (e.g., Sydney → Singapore [5 days] → London)
+- Complex business trips with multiple destinations
+- Avoiding specific airlines or inconvenient departure times
+- Finding the fastest or most balanced multi-city routes
+
+### `server_status`
+Check if the MCP server is running.
 
 ## Project Structure
 

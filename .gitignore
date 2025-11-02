@@ -38,5 +38,6 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Package manager lock files
-uv.lock 
+# Package manager lock files and secrets
+uv.lock
+.env
