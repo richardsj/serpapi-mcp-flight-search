@@ -1,7 +1,4 @@
-# MCP Flight Search
-<a href="https://glama.ai/mcp/servers/@arjunprabhulal/mcp-flight-search">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@arjunprabhulal/mcp-flight-search/badge" />
-</a>
+# MCP Flight Search - backed off Google Flights API
 
 A flight search service built with Model Context Protocol (MCP). This service demonstrates how to implement MCP tools for flight search capabilities.
 
@@ -41,6 +38,8 @@ python main.py --connection_type http --port 5000
 Set the SerpAPI key as an environment variable:
 ```bash
 export SERP_API_KEY="your-api-key-here"
+
+This is free to get and doesn't take long.
 ```
 
 ## Features
@@ -132,8 +131,7 @@ mcp-flight-search/
 ```
 
 ## Author
-
-For more articles on AI/ML and Generative AI, follow me on Medium: https://medium.com/@arjun-prabhulal
+Upgraded from the code from @arjun-prabhulal - some core bugs addressed and main remaining issues are the multi-leg routing is too simplistic/broad (it should use the booking key/session ID and allow you to progress gradually)
 
 ## License
 
